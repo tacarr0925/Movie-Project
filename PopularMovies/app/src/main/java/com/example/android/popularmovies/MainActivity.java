@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
@@ -23,20 +24,6 @@ public class MainActivity extends AppCompatActivity {
     private MovieInfoAdapter mMovieInfoAdapter;
     private List<MovieInfo> mMovieInfoList;
 
-    private static String[] testString = new String[] {
-            "Movie1",
-            "Movie2",
-            "Movie3",
-            "Movie4",
-            "Movie5",
-            "Movie6",
-            "Movie7",
-            "Movie8",
-            "Movie9",
-            "Movie10",
-            "Movie11"
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +37,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         mMovieInfoList = new ArrayList<>();
-
-        for (String test : testString) {
-            mMovieInfoList.add(new MovieInfo(test));
-            Log.d(TAG, test);
-        }
 
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
@@ -75,8 +57,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            super.onPostExecute(strings);
+        protected void onPostExecute(String[] movieData) {
+            if (movieData != null) {
+                mMovieInfoAdapter.setMovieData(movieData);
+            }
+            else {
+                // TODO create error message
+            }
         }
 
         @Override
@@ -88,12 +75,15 @@ public class MainActivity extends AppCompatActivity {
                 String jsonMovieDBResponse = NetworkUtils
                         .getResponseFromHttpUrl(movieDBRequestUrl);
 
-                Log.d (TAG, jsonMovieDBResponse);
+                String[] jsonMovieData = MovieJsonUtils
+                        .getMovieDBStringsFromJson(MainActivity.this, jsonMovieDBResponse);
+
+                return jsonMovieData;
 
             } catch (Exception e) {
                 e.printStackTrace();
+                return  null;
             }
-            return new String[0];
         }
     }
 }

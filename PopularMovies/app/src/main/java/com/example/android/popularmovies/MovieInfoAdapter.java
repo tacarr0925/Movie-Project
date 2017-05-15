@@ -5,7 +5,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -24,11 +26,11 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
     }
 
     public class MovieInfoAdapterViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mMovieInfoTextView;
+        public final ImageView mMovierPosterImageView;
 
         public MovieInfoAdapterViewHolder(View view) {
             super(view);
-            mMovieInfoTextView = (TextView) view.findViewById(R.id.tv_movie_test);
+            mMovierPosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
         }
     }
 
@@ -44,13 +46,24 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
 
     @Override
     public void onBindViewHolder(MovieInfoAdapterViewHolder movieInfoAdapterViewHolder, int position) {
-        String movieTestString = mMovieInfoList.get(position).movieTitle;
-        movieInfoAdapterViewHolder.mMovieInfoTextView.setText(movieTestString);
+        String moviePosterString = mMovieInfoList.get(position).moviePosterImage;
+        Picasso.with(movieInfoAdapterViewHolder.mMovierPosterImageView.getContext())
+                .load(moviePosterString)
+                .into(movieInfoAdapterViewHolder.mMovierPosterImageView);
     }
 
     @Override
     public int getItemCount() {
         if (mMovieInfoList == null) return 0;
         return mMovieInfoList.size();
+    }
+
+    public void setMovieData(String[] movieData) {
+        mMovieInfoList.clear();
+
+        for (String movie : movieData) {
+            mMovieInfoList.add(new MovieInfo(movie));
+        }
+        notifyDataSetChanged();
     }
 }

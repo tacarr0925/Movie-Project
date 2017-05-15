@@ -5,9 +5,9 @@ package com.example.android.popularmovies;
  */
 
 public class MovieInfo {
-    String movieTitle;
+    String moviePosterImage;
 
-    public MovieInfo (String movieTitle) {
-        this.movieTitle = movieTitle;
+    public MovieInfo (String moviePosterImage) {
+        this.moviePosterImage = moviePosterImage;
     }
 }
