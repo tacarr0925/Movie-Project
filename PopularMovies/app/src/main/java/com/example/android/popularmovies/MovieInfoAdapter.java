@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -21,16 +22,30 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
 
     private List<MovieInfo> mMovieInfoList;
 
-    public MovieInfoAdapter(List<MovieInfo> movieInfoList) {
-        mMovieInfoList = movieInfoList;
+    private final MovieInfoAdapterOnClickHandler mClickHandler;
+
+    public interface MovieInfoAdapterOnClickHandler {
+        void onClick(MovieInfo movieInfo);
     }
 
-    public class MovieInfoAdapterViewHolder extends RecyclerView.ViewHolder {
+    public MovieInfoAdapter(List<MovieInfo> movieInfoList, MovieInfoAdapterOnClickHandler clickHandler) {
+        mMovieInfoList = movieInfoList;
+        mClickHandler = clickHandler;
+    }
+
+    public class MovieInfoAdapterViewHolder extends RecyclerView.ViewHolder  implements OnClickListener {
         public final ImageView mMovierPosterImageView;
 
         public MovieInfoAdapterViewHolder(View view) {
             super(view);
             mMovierPosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            mClickHandler.onClick(mMovieInfoList.get(adapterPosition));
         }
     }
 

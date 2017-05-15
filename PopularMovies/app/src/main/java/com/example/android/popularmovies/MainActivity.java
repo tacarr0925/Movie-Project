@@ -1,5 +1,7 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.MovieInfoAdapterOnClickHandler {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         mMovieInfoList = new ArrayList<>();
 
-        mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList);
+        mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList, this);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
 
         loadMovieData();
@@ -47,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
     public void loadMovieData() {
         String test = "test";
         new FetchMovieTask().execute(test);
+    }
+
+    @Override
+    public void onClick(MovieInfo movieInfo) {
+        Context context = this;
+        Intent intentToStartDetailActivity = new Intent(context, DetailActivity.class);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, movieInfo.moviePosterImage);
+        startActivity(intentToStartDetailActivity);
     }
 
     public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
