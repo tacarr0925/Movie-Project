@@ -1,11 +1,15 @@
 package com.example.android.popularmovies;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.example.android.popularmovies.utilities.NetworkUtils;
+
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,5 +58,42 @@ public class MainActivity extends AppCompatActivity {
 
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
+
+        loadMovieData();
+    }
+
+    public void loadMovieData() {
+        String test = "test";
+        new FetchMovieTask().execute(test);
+    }
+
+    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+        }
+
+        @Override
+        protected String[] doInBackground(String... params) {
+
+            URL movieDBRequestUrl = NetworkUtils.buildUrl();
+
+            try {
+                String jsonMovieDBResponse = NetworkUtils
+                        .getResponseFromHttpUrl(movieDBRequestUrl);
+
+                Log.d (TAG, jsonMovieDBResponse);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new String[0];
+        }
     }
 }
