@@ -11,7 +11,6 @@ public class DetailActivity extends AppCompatActivity {
     private static final String TAG = DetailActivity.class.getSimpleName();
 
     private TextView mTestTextView;
-    private String mTestText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +22,11 @@ public class DetailActivity extends AppCompatActivity {
         Intent intentThatStartedThisActivity = getIntent();
 
         if (intentThatStartedThisActivity != null) {
-            if (intentThatStartedThisActivity.hasExtra(Intent.EXTRA_TEXT)) {
-                mTestText = intentThatStartedThisActivity.getStringExtra(Intent.EXTRA_TEXT);
-                mTestTextView.setText(mTestText);
+            Bundle bundle = intentThatStartedThisActivity.getExtras();
+            MovieInfo movieInfo = bundle.getParcelable("parseMovieInfo");
+
+            if (movieInfo != null) {
+                mTestTextView.setText(movieInfo.moviePosterImage);
             }
         }
 

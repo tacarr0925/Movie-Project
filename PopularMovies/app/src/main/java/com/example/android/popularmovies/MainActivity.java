@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
@@ -47,19 +48,20 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     }
 
     public void loadMovieData() {
-        String test = "test";
-        new FetchMovieTask().execute(test);
+        new FetchMovieTask().execute();
     }
-
+//TODO add rotation saveOnInstance; See udacity webcast
     @Override
     public void onClick(MovieInfo movieInfo) {
         Context context = this;
         Intent intentToStartDetailActivity = new Intent(context, DetailActivity.class);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, movieInfo.moviePosterImage);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("parseMovieInfo", movieInfo);
+        intentToStartDetailActivity.putExtras(bundle);
         startActivity(intentToStartDetailActivity);
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    public class FetchMovieTask extends AsyncTask<String, Void, List<MovieInfo>> {
 
         @Override
         protected void onPreExecute() {
@@ -67,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         }
 
         @Override
-        protected void onPostExecute(String[] movieData) {
-            if (movieData != null) {
-                mMovieInfoAdapter.setMovieData(movieData);
+        protected void onPostExecute(List<MovieInfo> movieDataList) {
+            if (movieDataList != null) {
+                mMovieInfoAdapter.setMovieData(movieDataList);
             }
             else {
                 // TODO create error message
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected List<MovieInfo> doInBackground(String... params) {
 
             URL movieDBRequestUrl = NetworkUtils.buildUrl();
 
@@ -85,10 +87,10 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
                 String jsonMovieDBResponse = NetworkUtils
                         .getResponseFromHttpUrl(movieDBRequestUrl);
 
-                String[] jsonMovieData = MovieJsonUtils
+                List<MovieInfo> jsonMovieInfoList = MovieJsonUtils
                         .getMovieDBStringsFromJson(MainActivity.this, jsonMovieDBResponse);
 
-                return jsonMovieData;
+                return jsonMovieInfoList;
 
             } catch (Exception e) {
                 e.printStackTrace();

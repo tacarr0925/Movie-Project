@@ -73,12 +73,8 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
         return mMovieInfoList.size();
     }
 
-    public void setMovieData(String[] movieData) {
-        mMovieInfoList.clear();
-
-        for (String movie : movieData) {
-            mMovieInfoList.add(new MovieInfo(movie));
-        }
+    public void setMovieData(List<MovieInfo> movieData) {
+        mMovieInfoList = movieData;
         notifyDataSetChanged();
     }
 }
