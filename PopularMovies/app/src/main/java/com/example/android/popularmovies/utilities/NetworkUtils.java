@@ -21,7 +21,7 @@ public class NetworkUtils {
     final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/discover/movie";
 
     final static String PARM_API_KEY = "api_key";
-    final static String apiKey = "{ADD YOU API KEY}";
+    final static String apiKey = "{ADD YOUR API KEY}";
     //final static String apiKey = "";
 
     final static String PARM_SORT = "sort_by";
