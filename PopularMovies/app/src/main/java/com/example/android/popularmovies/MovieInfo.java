@@ -59,4 +59,5 @@ public class MovieInfo implements Parcelable {
             return new MovieInfo[i];
         }
     };
+
 }

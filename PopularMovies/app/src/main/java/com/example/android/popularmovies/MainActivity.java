@@ -3,6 +3,7 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mMovieInfoAdapter;
-    private List<MovieInfo> mMovieInfoList;
+    private ArrayList<MovieInfo> mMovieInfoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +40,23 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mMovieInfoList = new ArrayList<>();
+        if (savedInstanceState == null || !savedInstanceState.containsKey("movieInfoList")) {
+            mMovieInfoList = new ArrayList<>();
+        }
+        else {
+            mMovieInfoList = savedInstanceState.getParcelableArrayList("movieInfoList");
+        }
 
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList, this);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
 
         loadMovieData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movieInfoList", mMovieInfoList);
+        super.onSaveInstanceState(outState);
     }
 
     public void loadMovieData() {
