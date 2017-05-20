@@ -26,14 +26,15 @@ public class NetworkUtils {
 
     final static String PARM_SORT = "sort_by";
     final static String sortByPopMovies = "popularity.desc";
+    final static String sortByTopRated = "vote_average.desc";
 
     final static String PARM_ADULT = "include_adult";
     final static String adult = "false";
 
-    public static URL buildUrl() {
+    public static URL buildUrl(String sortBy) {
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                 .appendQueryParameter(PARM_API_KEY, apiKey)
-                .appendQueryParameter(PARM_SORT, sortByPopMovies)
+                .appendQueryParameter(PARM_SORT, sortBy)
                 .appendQueryParameter(PARM_ADULT, adult)
                 .build();
 
@@ -64,5 +65,13 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static String get_sortByPopMovies() {
+        return sortByPopMovies;
+    }
+
+    public static String get_sortByTopRatedMovies() {
+        return sortByTopRated;
     }
 }
