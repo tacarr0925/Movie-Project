@@ -25,7 +25,7 @@ public class MovieInfo implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-    private MovieInfo (Parcel in){
+    private MovieInfo (Parcel in) {
         originalTitle = in.readString();
         moviePosterImage = in.readString();
         plotSynopsis = in.readString();
@@ -48,7 +48,7 @@ public class MovieInfo implements Parcelable {
         parcel.writeString(releaseDate);
     }
 
-    public final static Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public final static Parcelable.Creator<MovieInfo> CREATOR = new Parcelable.Creator<MovieInfo>() {
         @Override
         public MovieInfo createFromParcel(Parcel parcel) {
             return new MovieInfo(parcel);

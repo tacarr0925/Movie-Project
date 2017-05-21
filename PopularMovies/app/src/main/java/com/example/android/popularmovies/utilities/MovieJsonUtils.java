@@ -21,10 +21,10 @@ import java.util.List;
 public final class MovieJsonUtils {
     private static final String TAG = MovieJsonUtils.class.getSimpleName();
 
-    public static List<MovieInfo> getMovieDBStringsFromJson(Context context, String movieJsonStr)
+    public static ArrayList<MovieInfo> getMovieDBStringsFromJson(Context context, String movieJsonStr)
         throws JSONException {
 
-        List<MovieInfo> movieInfoList = new ArrayList<>();
+        ArrayList<MovieInfo> movieInfoList = new ArrayList<>();
 
         /*Movie list*/
         final String RESULT = "results";

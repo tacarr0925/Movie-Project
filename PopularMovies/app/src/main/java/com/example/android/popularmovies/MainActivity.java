@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     private Spinner mSortSpinner;
 
+    private boolean mHaveParceable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +65,11 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
         if (savedInstanceState == null || !savedInstanceState.containsKey("movieInfoList")) {
             mMovieInfoList = new ArrayList<>();
+            mHaveParceable = false;
         }
         else {
             mMovieInfoList = savedInstanceState.getParcelableArrayList("movieInfoList");
+            mHaveParceable = true;
         }
 
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList, this);
@@ -106,7 +110,12 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mSortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = parent.getItemAtPosition(position).toString();
+
+                /*We already have the Movie Data from onSaveInstance so we don't want to call*/
+                if (mHaveParceable) {
+                    mHaveParceable = false;
+                    return;
+                }
 
                 switch (position) {
                     case 0:
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, List<MovieInfo>> {
+    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieInfo>> {
 
         @Override
         protected void onPreExecute() {
@@ -161,11 +170,12 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         }
 
         @Override
-        protected void onPostExecute(List<MovieInfo> movieDataList) {
+        protected void onPostExecute(ArrayList<MovieInfo> movieDataList) {
             mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (movieDataList != null) {
                 showMovieDataView();
-                mMovieInfoAdapter.setMovieData(movieDataList);
+                mMovieInfoList = movieDataList;
+                mMovieInfoAdapter.setMovieData(mMovieInfoList);
             }
             else {
                 showErrorMessage();
@@ -173,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         }
 
         @Override
-        protected List<MovieInfo> doInBackground(String... params) {
+        protected ArrayList<MovieInfo> doInBackground(String... params) {
 
             String sortBy;
             if (params.length == 0) {
@@ -189,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
                 String jsonMovieDBResponse = NetworkUtils
                         .getResponseFromHttpUrl(movieDBRequestUrl);
 
-                List<MovieInfo> jsonMovieInfoList = MovieJsonUtils
+                ArrayList<MovieInfo> jsonMovieInfoList = MovieJsonUtils
                         .getMovieDBStringsFromJson(MainActivity.this, jsonMovieDBResponse);
 
                 return jsonMovieInfoList;
