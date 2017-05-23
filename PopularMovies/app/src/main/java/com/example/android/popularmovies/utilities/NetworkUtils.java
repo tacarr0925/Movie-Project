@@ -19,17 +19,15 @@ public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/discover/movie";
+    final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie";
 
     final static String PARM_API_KEY = "api_key";
     final static String apiKey = "{ADD YOUR API KEY}";
+    //final static String apiKey = "";
 
-    final static String PARM_SORT = "sort_by";
-    final static String sortByPopMovies = "popularity.desc";
-    final static String sortByTopRated = "vote_average.desc";
+    final static String sortByPopMovies = "popular";
+    final static String sortByTopRated = "top_rated";
 
-    final static String PARM_ADULT = "include_adult";
-    final static String adult = "false";
 
     /**
      * Builds a URL used to communicate with MovieDB.
@@ -38,9 +36,8 @@ public class NetworkUtils {
      */
     public static URL buildUrl(String sortBy) {
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(sortBy)
                 .appendQueryParameter(PARM_API_KEY, apiKey)
-                .appendQueryParameter(PARM_SORT, sortBy)
-                .appendQueryParameter(PARM_ADULT, adult)
                 .build();
 
         URL url = null;
@@ -49,6 +46,7 @@ public class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        //TODO take the tag out.
         Log.d (TAG, url.toString());
         return url;
     }
