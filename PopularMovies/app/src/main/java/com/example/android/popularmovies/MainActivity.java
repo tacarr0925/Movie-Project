@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int SPAN_COUNT = 2;
-
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mMovieInfoAdapter;
     private ArrayList<MovieInfo> mMovieInfoList;
@@ -53,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, SPAN_COUNT);
+        final int spanCount = getResources().getInteger(R.integer.grid_columns);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
