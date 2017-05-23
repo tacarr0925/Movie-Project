@@ -5,15 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.android.popularmovies.DetailActivity">
-<!--TODO update everything to res-->
+
     <TextView
         android:id="@+id/tv_detail_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="36sp"
         android:paddingLeft="24dp"
-        android:background="#009688"
-        android:textColor="#FFFFFF"
+        android:background="@color/colorSecondary"
+        android:textColor="@color/colorText"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

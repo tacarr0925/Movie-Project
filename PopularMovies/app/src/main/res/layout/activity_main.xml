@@ -12,7 +12,7 @@
         android:id="@+id/tv_error_message_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="An error has occurred. Please try again by selecting from the Spinner"
+        android:text="@string/error_message"
         android:textSize="20sp"
         android:visibility="invisible" />
 

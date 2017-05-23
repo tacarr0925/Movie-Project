@@ -3,10 +3,10 @@ package com.example.android.popularmovies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Date;
 
 /**
  * Created by Travis on 5/13/2017.
+ * This class is parcelable and holds the detail movie info.
  */
 
 public class MovieInfo implements Parcelable {
@@ -35,7 +35,6 @@ public class MovieInfo implements Parcelable {
 
     @Override
     public int describeContents() {
-        //TODO you might want to implement this
         return 0;
     }
 

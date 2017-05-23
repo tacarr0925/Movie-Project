@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by Travis on 5/13/2017.
+ * MovieInfoAdapter exposes a list of movies to the RecyclerView
  */
 
 public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.MovieInfoAdapterViewHolder> {
@@ -24,21 +25,32 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
 
     private final MovieInfoAdapterOnClickHandler mClickHandler;
 
+    /**
+     * The interface that receives onClick Messages
+     */
     public interface MovieInfoAdapterOnClickHandler {
         void onClick(MovieInfo movieInfo);
     }
 
+    /**
+     * Creates a MovieInfo Adapter
+     * @param movieInfoList a list of MovieInfo data
+     * @param clickHandler The is the on-click handler for this adapter.
+     */
     public MovieInfoAdapter(List<MovieInfo> movieInfoList, MovieInfoAdapterOnClickHandler clickHandler) {
         mMovieInfoList = movieInfoList;
         mClickHandler = clickHandler;
     }
 
+    /**
+     * Cache of the children views for Movie info list item
+     */
     public class MovieInfoAdapterViewHolder extends RecyclerView.ViewHolder  implements OnClickListener {
-        public final ImageView mMovierPosterImageView;
+        public final ImageView mMoviePosterImageView;
 
         public MovieInfoAdapterViewHolder(View view) {
             super(view);
-            mMovierPosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
+            mMoviePosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
             view.setOnClickListener(this);
         }
 
@@ -62,9 +74,9 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
     @Override
     public void onBindViewHolder(MovieInfoAdapterViewHolder movieInfoAdapterViewHolder, int position) {
         String moviePosterString = mMovieInfoList.get(position).moviePosterImage;
-        Picasso.with(movieInfoAdapterViewHolder.mMovierPosterImageView.getContext())
+        Picasso.with(movieInfoAdapterViewHolder.mMoviePosterImageView.getContext())
                 .load(moviePosterString)
-                .into(movieInfoAdapterViewHolder.mMovierPosterImageView);
+                .into(movieInfoAdapterViewHolder.mMoviePosterImageView);
     }
 
     @Override
@@ -73,6 +85,10 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
         return mMovieInfoList.size();
     }
 
+    /**
+     * Sets the movie data and notifies the adapter the data has changed
+     * @param movieData List of movie data
+     */
     public void setMovieData(List<MovieInfo> movieData) {
         mMovieInfoList = movieData;
         notifyDataSetChanged();

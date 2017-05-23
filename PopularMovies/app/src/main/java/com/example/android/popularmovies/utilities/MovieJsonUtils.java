@@ -1,8 +1,6 @@
 package com.example.android.popularmovies.utilities;
 
 import android.content.Context;
-import android.graphics.Movie;
-import android.util.Log;
 
 import com.example.android.popularmovies.MovieInfo;
 
@@ -10,17 +8,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Travis on 5/15/2017.
+ * Utility functions to handle MovieDB JSON Data.
  */
 
 public final class MovieJsonUtils {
     private static final String TAG = MovieJsonUtils.class.getSimpleName();
 
+    /**
+     * This method Parses JSON from a web response and returns a ArrayList of MovieInfo
+     *
+     * @param context context from MainActivity
+     * @param movieJsonStr JSON response from the server
+     * @return ArrayList of MovieInfo giving detail of each movie.
+     * @throws JSONException if JSON data cannot be  properly parsed
+     */
     public static ArrayList<MovieInfo> getMovieDBStringsFromJson(Context context, String movieJsonStr)
         throws JSONException {
 

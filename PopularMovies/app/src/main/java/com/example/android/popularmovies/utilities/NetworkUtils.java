@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 /**
  * Created by Travis on 5/15/2017.
+ * These utilities will be used do communicate with the MovieDB API.
  */
 
 public class NetworkUtils {
@@ -22,7 +23,6 @@ public class NetworkUtils {
 
     final static String PARM_API_KEY = "api_key";
     final static String apiKey = "{ADD YOUR API KEY}";
-    //final static String apiKey = "";
 
     final static String PARM_SORT = "sort_by";
     final static String sortByPopMovies = "popularity.desc";
@@ -31,6 +31,11 @@ public class NetworkUtils {
     final static String PARM_ADULT = "include_adult";
     final static String adult = "false";
 
+    /**
+     * Builds a URL used to communicate with MovieDB.
+     * @param sortBy user specified sort movie data.
+     * @return The URL used to query MovieDB.
+     */
     public static URL buildUrl(String sortBy) {
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                 .appendQueryParameter(PARM_API_KEY, apiKey)
@@ -48,6 +53,12 @@ public class NetworkUtils {
         return url;
     }
 
+    /**
+     * Returns the entire result from the HTTP response
+     * @param url The URL to fetch the response from
+     * @return The contents of the HTTP response
+     * @throws IOException Related to network and stream reading
+     */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -67,10 +78,18 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     *Getter for Sort by string for Popular Movies
+     * @return string of sort by Popular Movies
+     */
     public static String get_sortByPopMovies() {
         return sortByPopMovies;
     }
 
+    /**
+     *Getter for Sort by string for Top Rated Movies
+     * @return string of sort by Top Rated Movies
+     */
     public static String get_sortByTopRatedMovies() {
         return sortByTopRated;
     }

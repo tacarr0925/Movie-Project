@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 public class DetailActivity extends AppCompatActivity {
     private static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -43,7 +41,6 @@ public class DetailActivity extends AppCompatActivity {
             if (movieInfo != null) {
                 mTitleTextView.setText(movieInfo.originalTitle);
                 mPlotTextView.setText(movieInfo.plotSynopsis);
-                //TODO need to change to show the year
                 mReleaseDateTextView.setText(movieInfo.releaseDate);
                 mUserRatingTextView.setText(movieInfo.userRating + "/10");
 

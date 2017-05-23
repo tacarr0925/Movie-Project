@@ -3,14 +3,11 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.PersistableBundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,14 +17,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.MovieInfoAdapterOnClickHandler {
 
@@ -82,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         super.onSaveInstanceState(outState);
     }
 
-//TODO add rotation saveOnInstance; See udacity webcast
     @Override
     public void onClick(MovieInfo movieInfo) {
         Context context = this;
@@ -139,22 +133,34 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         return true;
     }
 
+    /**
+     * Using the sort by Popular movies this method will get movie data in the background.
+     */
     public void loadMostPopularMovieData() {
         showMovieDataView();
         new FetchMovieTask().execute(NetworkUtils.get_sortByPopMovies());
     }
 
+    /**
+     * Using the sort by Top Rated movies this method will get movie data in the background.
+     */
     public void loadTopRateMovieData() {
         showMovieDataView();
         new FetchMovieTask().execute(NetworkUtils.get_sortByTopRatedMovies());
     }
 
+    /**
+     * This method will display the recycle view holding the movie data.
+     */
     private void showMovieDataView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
 
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * This method will display an error message if can't get movie data.
+     */
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
 
