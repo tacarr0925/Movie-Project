@@ -76,6 +76,8 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
         String moviePosterString = mMovieInfoList.get(position).moviePosterImage;
         Picasso.with(movieInfoAdapterViewHolder.mMoviePosterImageView.getContext())
                 .load(moviePosterString)
+                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_launcher)
                 .into(movieInfoAdapterViewHolder.mMoviePosterImageView);
     }
 

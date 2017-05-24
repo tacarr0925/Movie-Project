@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int spinnerPosition = 0;
+
         setContentView(R.layout.activity_main);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
@@ -62,7 +64,27 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
             mHaveParceable = false;
         }
         else {
+            if (!savedInstanceState.containsKey("SpinnerPosition")) {
+                spinnerPosition = 0;
+            }
+            else {
+                spinnerPosition = savedInstanceState.getInt("SpinnerPosition");
+            }
             mMovieInfoList = savedInstanceState.getParcelableArrayList("movieInfoList");
+
+            if (mMovieInfoList == null || mMovieInfoList.size() == 0) {
+                switch (spinnerPosition) {
+                    case 0:
+                        loadMostPopularMovieData();
+                        break;
+                    case 1:
+                        loadTopRateMovieData();
+                        break;
+                    default:
+                        break;
+
+                }
+            }
             mHaveParceable = true;
         }
 
@@ -73,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movieInfoList", mMovieInfoList);
+        outState.putInt("SpinnerPosition", mSortSpinner.getSelectedItemPosition());
         super.onSaveInstanceState(outState);
     }
 

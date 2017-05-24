@@ -23,7 +23,6 @@ public class NetworkUtils {
 
     final static String PARM_API_KEY = "api_key";
     final static String apiKey = "{ADD YOUR API KEY}";
-    //final static String apiKey = "";
 
     final static String sortByPopMovies = "popular";
     final static String sortByTopRated = "top_rated";
