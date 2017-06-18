@@ -3,6 +3,7 @@ package com.example.android.popularmovies.utilities;
 import android.content.Context;
 
 import com.example.android.popularmovies.MovieInfo;
+import com.example.android.popularmovies.MovieTrailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,5 +76,35 @@ public final class MovieJsonUtils {
         }
 
         return movieInfoList;
+    }
+
+    public  static ArrayList<MovieTrailer> getTrailerStringFromJson(Context context, String trailerJsonStr)
+        throws JSONException {
+
+        /*Trailer list*/
+        final String RESULT = "results";
+        /*YouTube Key*/
+        final String KEY = "key";
+        /*Name of Trailer*/
+        final String NAME = "name";
+
+        ArrayList<MovieTrailer> trailerList = new ArrayList<>();
+
+        JSONObject trailerJson = new JSONObject(trailerJsonStr);
+
+        JSONArray trailerArray = trailerJson.getJSONArray(RESULT);
+
+        for (int i = 0; i < trailerArray.length(); i++) {
+            String youTubeKey;
+            String name;
+
+            JSONObject trailerData = trailerArray.getJSONObject(i);
+
+            youTubeKey = trailerData.getString(KEY);
+            name = trailerData.getString(NAME);
+
+            trailerList.add(new MovieTrailer(name, youTubeKey));
+        }
+        return trailerList;
     }
 }

@@ -6,4 +6,9 @@
         <item>Most Popular</item>
         <item>Top Rated</item>
     </string-array>
+
+
+
+    <!--Test Strings-->
+    <string name="trailer">Trailer</string>
 </resources>

@@ -21,11 +21,14 @@ public class NetworkUtils {
 
     final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie";
 
+
     final static String PARM_API_KEY = "api_key";
     final static String apiKey = "{ADD YOUR API KEY}";
+    //final static String apiKey = "";
 
     final static String sortByPopMovies = "popular";
     final static String sortByTopRated = "top_rated";
+    final static String VIDEOS = "videos";
 
 
     /**
@@ -34,6 +37,7 @@ public class NetworkUtils {
      * @return The URL used to query MovieDB.
      */
     public static URL buildUrl(String sortBy) {
+        //TODO Update to use preferences.  Have new method to call buildUrl based on preferences.
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                 .appendPath(sortBy)
                 .appendQueryParameter(PARM_API_KEY, apiKey)
@@ -47,6 +51,24 @@ public class NetworkUtils {
         }
         //TODO take the tag out.
         Log.d (TAG, url.toString());
+        return url;
+    }
+
+    public static URL buildTrailerUrl(String movieId) {
+        Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(movieId)
+                .appendPath(VIDEOS)
+                .appendQueryParameter(PARM_API_KEY, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //TODO take the tag out.
+        Log.d(TAG, url.toString());
         return url;
     }
 
