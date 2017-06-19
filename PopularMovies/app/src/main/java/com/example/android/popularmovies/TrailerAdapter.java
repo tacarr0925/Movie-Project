@@ -19,8 +19,15 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
 
     private List<MovieTrailer> mTrailerList;
 
-    public TrailerAdapter(List<MovieTrailer> trailerList) {
+    private final TrailerAdapterOnClickHandler mClickHandler;
+
+    public interface TrailerAdapterOnClickHandler {
+        void onClick(String key);
+    }
+
+    public TrailerAdapter(List<MovieTrailer> trailerList, TrailerAdapterOnClickHandler clickHandler) {
         mTrailerList = trailerList;
+        mClickHandler = clickHandler;
     }
 
     @Override
@@ -43,12 +50,19 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         return mTrailerList.size();
     }
 
-    public class TrailerAdapterViewHolder extends RecyclerView.ViewHolder {
+    public class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final TextView mTrailerNameTextView;
 
         public TrailerAdapterViewHolder(View itemView) {
             super(itemView);
             mTrailerNameTextView = (TextView) itemView.findViewById(R.id.tv_trailer_name);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int adapterPosition = getAdapterPosition();
+            mClickHandler.onClick(mTrailerList.get(adapterPosition).youTubeKey);
         }
     }
 }

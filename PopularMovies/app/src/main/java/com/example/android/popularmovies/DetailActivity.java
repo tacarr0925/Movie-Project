@@ -1,10 +1,12 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,7 +14,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler {
     private static final String TAG = DetailActivity.class.getSimpleName();
 
     private TextView mTitleTextView;
@@ -74,7 +76,14 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
 
-        mTrailerAdapter = new TrailerAdapter(mTrailerList);
+        mTrailerAdapter = new TrailerAdapter(mTrailerList, this);
         mRecyclerView.setAdapter(mTrailerAdapter);
+    }
+
+    @Override
+    public void onClick(String key) {
+        Uri uri = Uri.parse("http://www.youtube.com/watch?v=" + key);
+        Log.d(TAG, uri.toString());
+        startActivity(new Intent(Intent.ACTION_VIEW, uri));
     }
 }

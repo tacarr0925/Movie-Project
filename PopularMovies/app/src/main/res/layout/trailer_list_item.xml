@@ -16,7 +16,7 @@
         />
 
     <ImageButton
-        android:id="@+id/im_button_play"
+        android:id="@+id/iv_button_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_media_play"
@@ -32,6 +32,6 @@
         tools:text="@string/trailer"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:layout_constraintLeft_toRightOf="@+id/im_button_play"
+        app:layout_constraintLeft_toRightOf="@+id/iv_button_play"
         android:layout_marginLeft="32dp" />
 </android.support.constraint.ConstraintLayout>
