@@ -72,7 +72,8 @@ public final class MovieJsonUtils {
             userRating = movieData.getString(USER_RATING);
             releaseDate = movieData.getString(RELEASE_DATE);
 
-            movieInfoList.add(new MovieInfo(title, posterPathUrl + posterPath, plotSynopsis, userRating, releaseDate));
+            //TODO update JSON to get movie id
+            movieInfoList.add(new MovieInfo("335988",title, posterPathUrl + posterPath, plotSynopsis, userRating, releaseDate));
         }
 
         return movieInfoList;

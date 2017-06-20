@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,11 +11,13 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.utilities.FetchTrailerTask;
+import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler, FetchTrailerTask.AsyncTaskCallBack {
     private static final String TAG = DetailActivity.class.getSimpleName();
 
     private TextView mTitleTextView;
@@ -22,6 +25,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private TextView mPlotTextView;
     private TextView mReleaseDateTextView;
     private TextView mUserRatingTextView;
+
+    private String mMovieId;
 
     private RecyclerView mRecyclerView;
     private TrailerAdapter mTrailerAdapter;
@@ -50,14 +55,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        //TODO REPLACE This is just test data
-        mTrailerList = new ArrayList<>();
-        mTrailerList.add(new MovieTrailer("IMAX Featurette", "sKyLJI91EM0"));
-        mTrailerList.add(new MovieTrailer("Big Game Spot", "npaVgxxtKxQ"));
-        mTrailerList.add(new MovieTrailer("Extended Big Game Spot", "B4LC8GOdfSE"));
-        mTrailerList.add(new MovieTrailer("We got it", "9rkWw4SE9fc"));
-
-
         Intent intentThatStartedThisActivity = getIntent();
 
         if (intentThatStartedThisActivity != null) {
@@ -69,12 +66,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 mPlotTextView.setText(movieInfo.plotSynopsis);
                 mReleaseDateTextView.setText(movieInfo.releaseDate);
                 mUserRatingTextView.setText(movieInfo.userRating + "/10");
+                mMovieId = movieInfo.movieId;
 
-               Picasso.with(this)
+                Picasso.with(this)
                         .load(movieInfo.moviePosterImage)
                         .into(mImagePosterImageView);
             }
         }
+
+        loadTrailerData();
 
         mTrailerAdapter = new TrailerAdapter(mTrailerList, this);
         mRecyclerView.setAdapter(mTrailerAdapter);
@@ -85,5 +85,19 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         Uri uri = Uri.parse("http://www.youtube.com/watch?v=" + key);
         Log.d(TAG, uri.toString());
         startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    }
+
+    @Override
+    public void onAsyncTaskComplete(ArrayList<MovieTrailer> list) {
+        //TODO set visibility of loading indicator
+        //TODO Show error message if need be or show the view
+        if (list != null) {
+            mTrailerList = list;
+            mTrailerAdapter.setTrailerData(mTrailerList);
+        }
+    }
+
+    public void loadTrailerData() {
+        new FetchTrailerTask(this, this).execute(mMovieId);
     }
 }

@@ -65,4 +65,9 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
             mClickHandler.onClick(mTrailerList.get(adapterPosition).youTubeKey);
         }
     }
+
+    public void setTrailerData(List<MovieTrailer> list) {
+        mTrailerList = list;
+        notifyDataSetChanged();
+    }
 }
