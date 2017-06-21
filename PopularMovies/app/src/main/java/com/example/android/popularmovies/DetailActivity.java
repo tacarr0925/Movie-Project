@@ -11,13 +11,17 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.utilities.FetchTrailerTask;
+import com.example.android.popularmovies.utilities.FetchJsonTask;
+import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 
-public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler, FetchTrailerTask.AsyncTaskCallBack {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler,
+        FetchJsonTask.AsyncTaskCallBack {
     private static final String TAG = DetailActivity.class.getSimpleName();
 
     private TextView mTitleTextView;
@@ -88,16 +92,20 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     @Override
-    public void onAsyncTaskComplete(ArrayList<MovieTrailer> list) {
+    public void onAsyncTaskComplete(String jsonString) {
         //TODO set visibility of loading indicator
         //TODO Show error message if need be or show the view
-        if (list != null) {
-            mTrailerList = list;
+        if (jsonString != null && jsonString.length() > 0) {
+            try {
+                mTrailerList = MovieJsonUtils.getTrailerStringFromJson(this, jsonString);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             mTrailerAdapter.setTrailerData(mTrailerList);
         }
     }
 
     public void loadTrailerData() {
-        new FetchTrailerTask(this, this).execute(mMovieId);
+        new FetchJsonTask(this).execute(NetworkUtils.buildTrailerUrl(mMovieId));
     }
 }

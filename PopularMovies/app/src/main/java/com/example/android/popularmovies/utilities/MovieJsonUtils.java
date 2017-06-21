@@ -35,6 +35,9 @@ public final class MovieJsonUtils {
         /*Movie list*/
         final String RESULT = "results";
 
+        /*Movie Id*/
+        final String MOVIE_ID = "id";
+
         /*Original Title*/
         final String ORIGINAL_TITLE = "original_title";
 
@@ -58,6 +61,7 @@ public final class MovieJsonUtils {
         JSONArray movieArray = movieDBJson.getJSONArray(RESULT);
 
         for (int i = 0; i <movieArray.length(); i++) {
+            String id;
             String title;
             String posterPath;
             String plotSynopsis;
@@ -66,14 +70,14 @@ public final class MovieJsonUtils {
 
             JSONObject movieData = movieArray.getJSONObject(i);
 
+            id = movieData.getString(MOVIE_ID);
             title = movieData.getString(ORIGINAL_TITLE);
             posterPath = movieData.getString(POSTER_PATH);
             plotSynopsis = movieData.getString(PLOT_SYNOPSIS);
             userRating = movieData.getString(USER_RATING);
             releaseDate = movieData.getString(RELEASE_DATE);
 
-            //TODO update JSON to get movie id
-            movieInfoList.add(new MovieInfo("335988",title, posterPathUrl + posterPath, plotSynopsis, userRating, releaseDate));
+            movieInfoList.add(new MovieInfo(id,title, posterPathUrl + posterPath, plotSynopsis, userRating, releaseDate));
         }
 
         return movieInfoList;

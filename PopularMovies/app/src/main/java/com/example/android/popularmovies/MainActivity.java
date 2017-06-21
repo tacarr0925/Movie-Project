@@ -18,13 +18,17 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.utilities.FetchJsonTask;
 import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
+
+import org.json.JSONException;
 
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.MovieInfoAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.MovieInfoAdapterOnClickHandler,
+        FetchJsonTask.AsyncTaskCallBack {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -114,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.movie, menu);
 
+        //TODO Remove spinner and change to preferences
         MenuItem item = menu.findItem(R.id.action_spinner);
         mSortSpinner = (Spinner) MenuItemCompat.getActionView(item);
 
@@ -160,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
      */
     public void loadMostPopularMovieData() {
         showMovieDataView();
-        new FetchMovieTask().execute(NetworkUtils.get_sortByPopMovies());
+        new FetchJsonTask(this).execute(NetworkUtils.buildUrl(NetworkUtils.get_sortByPopMovies()));
     }
 
     /**
@@ -168,7 +173,8 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
      */
     public void loadTopRateMovieData() {
         showMovieDataView();
-        new FetchMovieTask().execute(NetworkUtils.get_sortByTopRatedMovies());
+        //TODO Change to call one function and the preferences decides what to load
+        new FetchJsonTask(this).execute(NetworkUtils.buildUrl(NetworkUtils.get_sortByTopRatedMovies()));
     }
 
     /**
@@ -189,53 +195,28 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieInfo>> {
+    @Override
+    public void onAsyncTaskComplete(String jsonString) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        try {
+            ArrayList<MovieInfo> movieInfoList = MovieJsonUtils
+                    .getMovieDBStringsFromJson(this, jsonString);
 
-        @Override
-        protected void onPostExecute(ArrayList<MovieInfo> movieDataList) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (movieDataList != null) {
+            if (movieInfoList != null) {
                 showMovieDataView();
-                mMovieInfoList = movieDataList;
+                mMovieInfoList = movieInfoList;
                 mMovieInfoAdapter.setMovieData(mMovieInfoList);
             }
             else {
                 showErrorMessage();
             }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            showErrorMessage();
         }
 
-        @Override
-        protected ArrayList<MovieInfo> doInBackground(String... params) {
 
-            String sortBy;
-            if (params.length == 0) {
-                sortBy = NetworkUtils.get_sortByPopMovies();
-            }
-            else {
-                sortBy = params[0];
-            }
-
-            URL movieDBRequestUrl = NetworkUtils.buildUrl(sortBy);
-
-            try {
-                String jsonMovieDBResponse = NetworkUtils
-                        .getResponseFromHttpUrl(movieDBRequestUrl);
-
-                ArrayList<MovieInfo> jsonMovieInfoList = MovieJsonUtils
-                        .getMovieDBStringsFromJson(MainActivity.this, jsonMovieDBResponse);
-
-                return jsonMovieInfoList;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return  null;
-            }
-        }
     }
 }
