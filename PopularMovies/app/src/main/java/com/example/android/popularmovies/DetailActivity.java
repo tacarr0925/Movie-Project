@@ -95,7 +95,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     public void onAsyncTaskComplete(String jsonString) {
         //TODO set visibility of loading indicator
         //TODO Show error message if need be or show the view
-        if (jsonString != null && jsonString.length() > 0) {
+        if (jsonString != null) {
             try {
                 mTrailerList = MovieJsonUtils.getTrailerStringFromJson(this, jsonString);
             } catch (JSONException e) {

@@ -6,8 +6,18 @@
         <item>Most Popular</item>
         <item>Top Rated</item>
     </string-array>
+    <string name="action_settings">Settings</string>
 
+    <!--Preference Labels-->
+    <string name="pref_sort_label">Movie Sort</string>
+    <string name="pref_sort_key" translatable="false">movie</string>
+    <string name="pref_pop_movies_label">Popular Movies</string>
+    <string name="pref_top_rated_label">Top Rated Movies</string>
+    <string name="pref_favorite_label">Favorite Movies</string>
 
+    <string name="pref_pop_movies_value" translatable="false">popular</string>
+    <string name="pref_top_rated_value" translatable="false">top_rated</string>
+    <string name="pref_favorite_value" translatable="false">favorite</string>
 
     <!--Test Strings-->
     <string name="trailer">Trailer</string>

@@ -21,12 +21,20 @@ public class FetchJsonTask extends AsyncTask<Object, Void, String> {
 
     @Override
     protected String doInBackground(Object... params) {
-        URL requestUrl = (URL)params[0];
+        int taskId = (int)params[0];
+        URL requestUrl = (URL)params[1];
 
         try {
             String jsonResponse = NetworkUtils
                     .getResponseFromHttpUrl(requestUrl);
 
+            switch (taskId) {
+                case 100:
+
+                    break;
+                default:
+                    break;
+            }
             return jsonResponse;
         } catch (Exception e) {
             e.printStackTrace();

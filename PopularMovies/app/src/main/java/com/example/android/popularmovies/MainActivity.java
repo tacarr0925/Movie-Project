@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final int MOVIES_TASK_ID = 100;
+
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mMovieInfoAdapter;
     private ArrayList<MovieInfo> mMovieInfoList;
@@ -160,12 +162,24 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         return true;
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     /**
      * Using the sort by Popular movies this method will get movie data in the background.
      */
     public void loadMostPopularMovieData() {
         showMovieDataView();
-        new FetchJsonTask(this).execute(NetworkUtils.buildUrl(NetworkUtils.get_sortByPopMovies()));
+        new FetchJsonTask(this).execute(MOVIES_TASK_ID, NetworkUtils.buildUrl(NetworkUtils.get_sortByPopMovies()));
     }
 
     /**
@@ -174,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     public void loadTopRateMovieData() {
         showMovieDataView();
         //TODO Change to call one function and the preferences decides what to load
-        new FetchJsonTask(this).execute(NetworkUtils.buildUrl(NetworkUtils.get_sortByTopRatedMovies()));
+        new FetchJsonTask(this).execute(MOVIES_TASK_ID, NetworkUtils.buildUrl(NetworkUtils.get_sortByTopRatedMovies()));
     }
 
     /**
