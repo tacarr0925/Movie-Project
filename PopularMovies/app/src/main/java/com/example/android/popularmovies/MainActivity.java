@@ -2,37 +2,32 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v4.view.MenuItemCompat;
+import android.content.SharedPreferences;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.utilities.FetchJsonTask;
-import com.example.android.popularmovies.utilities.MovieJsonUtils;
-import com.example.android.popularmovies.utilities.NetworkUtils;
+import com.example.android.popularmovies.sync.MovieAsyncTaskLoader;
 
-import org.json.JSONException;
-
-import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.MovieInfoAdapterOnClickHandler,
-        FetchJsonTask.AsyncTaskCallBack {
+        LoaderManager.LoaderCallbacks<ArrayList<MovieInfo>>,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int MOVIES_TASK_ID = 100;
+    private static final int ID_MOVIE_LOADER = 100;
 
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mMovieInfoAdapter;
@@ -42,14 +37,10 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     private ProgressBar mLoadingIndicator;
 
-    private Spinner mSortSpinner;
-
-    private boolean mHaveParceable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int spinnerPosition = 0;
 
         setContentView(R.layout.activity_main);
 
@@ -62,46 +53,38 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         final int spanCount = getResources().getInteger(R.integer.grid_columns);
         GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
 
+        setupSharedPreferences();
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
         if (savedInstanceState == null || !savedInstanceState.containsKey("movieInfoList")) {
             mMovieInfoList = new ArrayList<>();
-            mHaveParceable = false;
         }
         else {
-            if (!savedInstanceState.containsKey("SpinnerPosition")) {
-                spinnerPosition = 0;
-            }
-            else {
-                spinnerPosition = savedInstanceState.getInt("SpinnerPosition");
-            }
             mMovieInfoList = savedInstanceState.getParcelableArrayList("movieInfoList");
 
             if (mMovieInfoList == null || mMovieInfoList.size() == 0) {
-                switch (spinnerPosition) {
-                    case 0:
-                        loadMostPopularMovieData();
-                        break;
-                    case 1:
-                        loadTopRateMovieData();
-                        break;
-                    default:
-                        break;
-
-                }
+                loadMovieData();
             }
-            mHaveParceable = true;
         }
 
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList, this);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
+    }
+
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //TODO use the preference to determine what to pull
+        sharedPreferences.getString(getString(R.string.pref_sort_key), getString(R.string.pref_pop_movies_value));
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movieInfoList", mMovieInfoList);
-        outState.putInt("SpinnerPosition", mSortSpinner.getSelectedItemPosition());
         super.onSaveInstanceState(outState);
     }
 
@@ -120,44 +103,6 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.movie, menu);
 
-        //TODO Remove spinner and change to preferences
-        MenuItem item = menu.findItem(R.id.action_spinner);
-        mSortSpinner = (Spinner) MenuItemCompat.getActionView(item);
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_array, R.layout.spinner);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        mSortSpinner.setAdapter(adapter);
-
-        mSortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                /*We already have the Movie Data from onSaveInstance so we don't want to call*/
-                if (mHaveParceable) {
-                    mHaveParceable = false;
-                    return;
-                }
-
-                switch (position) {
-                    case 0:
-                        loadMostPopularMovieData();
-                        break;
-                    case 1:
-                        loadTopRateMovieData();
-                        break;
-                    default:
-                        break;
-
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
 
         return true;
     }
@@ -177,18 +122,18 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     /**
      * Using the sort by Popular movies this method will get movie data in the background.
      */
-    public void loadMostPopularMovieData() {
+    public void loadMovieData() {
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<ArrayList<MovieInfo>> movieAsyncTaskLoader = loaderManager.getLoader(ID_MOVIE_LOADER);
         showMovieDataView();
-        new FetchJsonTask(this).execute(MOVIES_TASK_ID, NetworkUtils.buildUrl(NetworkUtils.get_sortByPopMovies()));
-    }
 
-    /**
-     * Using the sort by Top Rated movies this method will get movie data in the background.
-     */
-    public void loadTopRateMovieData() {
-        showMovieDataView();
-        //TODO Change to call one function and the preferences decides what to load
-        new FetchJsonTask(this).execute(MOVIES_TASK_ID, NetworkUtils.buildUrl(NetworkUtils.get_sortByTopRatedMovies()));
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+
+        if (movieAsyncTaskLoader == null) {
+            loaderManager.initLoader(ID_MOVIE_LOADER, null, this);
+        } else {
+            loaderManager.restartLoader(ID_MOVIE_LOADER, null, this);
+        }
     }
 
     /**
@@ -210,27 +155,38 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     }
 
     @Override
-    public void onAsyncTaskComplete(String jsonString) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_sort_key))) {
+            //TODO need to update movies based on the change.
+        }
+    }
+
+    @Override
+    public Loader<ArrayList<MovieInfo>> onCreateLoader(int id, Bundle args) {
+
+        switch(id) {
+            case ID_MOVIE_LOADER:
+                return new MovieAsyncTaskLoader(this);
+            default:
+                throw new RuntimeException("Loader Not Implement: " + id);
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<MovieInfo>> loader, ArrayList<MovieInfo> data) {
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        try {
-            ArrayList<MovieInfo> movieInfoList = MovieJsonUtils
-                    .getMovieDBStringsFromJson(this, jsonString);
-
-            if (movieInfoList != null) {
-                showMovieDataView();
-                mMovieInfoList = movieInfoList;
-                mMovieInfoAdapter.setMovieData(mMovieInfoList);
-            }
-            else {
-                showErrorMessage();
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (data != null) {
+            showMovieDataView();
+            mMovieInfoList = data;
+            mMovieInfoAdapter.setMovieData(mMovieInfoList);
+        } else {
             showErrorMessage();
         }
+    }
 
-
+    @Override
+    public void onLoaderReset(Loader<ArrayList<MovieInfo>> loader) {
+        mMovieInfoAdapter.setMovieData(null);
     }
 }

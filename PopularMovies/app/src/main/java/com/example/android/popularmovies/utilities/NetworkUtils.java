@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.utilities;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
@@ -30,7 +31,27 @@ public class NetworkUtils {
     final static String sortByTopRated = "top_rated";
     final static String VIDEOS = "videos";
 
+    public static URL getMovieUrl(Context context) {
+        //TODO build based on preferences
+        return buildUrlWithPopularMovies();
+    }
 
+    public static URL buildUrlWithPopularMovies() {
+        Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(sortByPopMovies)
+                .appendQueryParameter(PARM_API_KEY, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //TODO take out tag
+        Log.d(TAG, url.toString());
+        return url;
+    }
     /**
      * Builds a URL used to communicate with MovieDB.
      * @param sortBy user specified sort movie data.
