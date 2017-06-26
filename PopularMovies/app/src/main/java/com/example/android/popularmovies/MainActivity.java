@@ -74,11 +74,15 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mRecyclerView.setAdapter(mMovieInfoAdapter);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
     private void setupSharedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        //TODO use the preference to determine what to pull
-        sharedPreferences.getString(getString(R.string.pref_sort_key), getString(R.string.pref_pop_movies_value));
-
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_sort_key))) {
-            //TODO need to update movies based on the change.
+            loadMovieData();
         }
     }
 

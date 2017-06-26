@@ -1,8 +1,12 @@
 package com.example.android.popularmovies.utilities;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+
+import com.example.android.popularmovies.R;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +36,20 @@ public class NetworkUtils {
     final static String VIDEOS = "videos";
 
     public static URL getMovieUrl(Context context) {
-        //TODO build based on preferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String keyForMovieSort = context.getString(R.string.pref_sort_key);
+        String defaultMovieSort = context.getString(R.string.pref_pop_movies_value);
+
+        String sortBy = sharedPreferences.getString(keyForMovieSort, defaultMovieSort);
+
+        if (sortBy.equals(context.getString(R.string.pref_pop_movies_value))) {
+            return buildUrlWithPopularMovies();
+        } else if (sortBy.equals(context.getString(R.string.pref_top_rated_value))) {
+            return buildUrlWithTopRatedMovies();
+        }
+
+        Log.d(TAG, "No PREFERENCE");
+        //TODO fix after favorites added.
         return buildUrlWithPopularMovies();
     }
 
@@ -52,6 +69,24 @@ public class NetworkUtils {
         Log.d(TAG, url.toString());
         return url;
     }
+
+    public static URL buildUrlWithTopRatedMovies() {
+        Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(sortByTopRated)
+                .appendQueryParameter(PARM_API_KEY, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //TODO take out tag
+        Log.d(TAG, url.toString());
+        return url;
+    }
+
     /**
      * Builds a URL used to communicate with MovieDB.
      * @param sortBy user specified sort movie data.
@@ -116,21 +151,5 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
-    }
-
-    /**
-     *Getter for Sort by string for Popular Movies
-     * @return string of sort by Popular Movies
-     */
-    public static String get_sortByPopMovies() {
-        return sortByPopMovies;
-    }
-
-    /**
-     *Getter for Sort by string for Top Rated Movies
-     * @return string of sort by Top Rated Movies
-     */
-    public static String get_sortByTopRatedMovies() {
-        return sortByTopRated;
     }
 }

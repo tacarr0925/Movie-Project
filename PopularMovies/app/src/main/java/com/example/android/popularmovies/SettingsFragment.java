@@ -37,8 +37,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
         for (int i = 0; i < count; i++) {
             Preference preference = preferenceScreen.getPreference(i);
-
-            //If you add check boxes in preference need to bypass them.  They are set up in the XML already
+            if (!(preference instanceof CheckBoxPreference)) {
+                String value = sharedPreferences.getString(preference.getKey(), "");
+                setPreferenceSummary(preference, value);
+            }
         }
 
         Preference preference = findPreference(getString(R.string.pref_sort_key));

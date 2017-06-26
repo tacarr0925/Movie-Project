@@ -25,7 +25,6 @@ public class MovieAsyncTaskLoader extends AsyncTaskLoader<ArrayList<MovieInfo>> 
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        //TODO Possible add the loading indicator here
         if (mMovieInfoList != null){
             deliverResult(mMovieInfoList);
         } else {
