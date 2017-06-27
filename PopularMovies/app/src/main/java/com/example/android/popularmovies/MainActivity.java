@@ -180,10 +180,11 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     public void onLoadFinished(Loader<ArrayList<MovieInfo>> loader, ArrayList<MovieInfo> data) {
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (data != null) {
+        if (data != null  ||  !data.isEmpty()) {
             showMovieDataView();
             mMovieInfoList = data;
             mMovieInfoAdapter.setMovieData(mMovieInfoList);
+            mRecyclerView.smoothScrollToPosition(0);
         } else {
             showErrorMessage();
         }

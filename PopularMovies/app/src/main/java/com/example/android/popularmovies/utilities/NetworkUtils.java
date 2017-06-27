@@ -93,7 +93,6 @@ public class NetworkUtils {
      * @return The URL used to query MovieDB.
      */
     public static URL buildUrl(String sortBy) {
-        //TODO Update to use preferences.  Have new method to call buildUrl based on preferences.
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                 .appendPath(sortBy)
                 .appendQueryParameter(PARM_API_KEY, apiKey)
