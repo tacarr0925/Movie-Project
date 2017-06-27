@@ -3,14 +3,18 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.sync.TrailerAsyncTaskLoader;
 import com.example.android.popularmovies.utilities.FetchJsonTask;
 import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
@@ -21,8 +25,12 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler,
-        FetchJsonTask.AsyncTaskCallBack {
+        LoaderManager.LoaderCallbacks<ArrayList<MovieTrailer>> {
+
     private static final String TAG = DetailActivity.class.getSimpleName();
+
+    private static final int ID_TRAILER_LOADER = 101;
+    private static final int ID_REVIEW_LOADER = 102;
 
     private TextView mTitleTextView;
     private ImageView mImagePosterImageView;
@@ -78,8 +86,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             }
         }
 
-        loadTrailerData();
-
+        getSupportLoaderManager().initLoader(ID_TRAILER_LOADER, null, this);
         mTrailerAdapter = new TrailerAdapter(mTrailerList, this);
         mRecyclerView.setAdapter(mTrailerAdapter);
     }
@@ -92,20 +99,31 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     @Override
-    public void onAsyncTaskComplete(String jsonString) {
-        //TODO set visibility of loading indicator
-        //TODO Show error message if need be or show the view
-        if (jsonString != null) {
-            try {
-                mTrailerList = MovieJsonUtils.getTrailerStringFromJson(this, jsonString);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            mTrailerAdapter.setTrailerData(mTrailerList);
+    public Loader<ArrayList<MovieTrailer>> onCreateLoader(int id, Bundle args) {
+
+        switch (id) {
+            case ID_TRAILER_LOADER:
+                return new TrailerAsyncTaskLoader(this, mMovieId);
+            default:
+                throw new RuntimeException("Loader not Implemented" + id);
         }
     }
 
-    public void loadTrailerData() {
-        new FetchJsonTask(this).execute(NetworkUtils.buildTrailerUrl(mMovieId));
+    @Override
+    public void onLoadFinished(Loader<ArrayList<MovieTrailer>> loader, ArrayList<MovieTrailer> data) {
+        //TODO Implement functionality commented out below
+        //mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (data != null || !data.isEmpty()) {
+            //showTrailerDataView();
+            mTrailerList = data;
+            mTrailerAdapter.setTrailerData(mTrailerList);
+        } /*else {
+            showErrorMessage();
+        }*/
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<MovieTrailer>> loader) {
+        mTrailerAdapter.setTrailerData(null);
     }
 }

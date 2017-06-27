@@ -25,7 +25,8 @@ public class MovieAsyncTaskLoader extends AsyncTaskLoader<ArrayList<MovieInfo>> 
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        if (mMovieInfoList != null){
+
+        if (mMovieInfoList != null) {
             deliverResult(mMovieInfoList);
         } else {
             forceLoad();
