@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,12 +10,12 @@ import android.os.Parcelable;
  */
 
 public class MovieInfo implements Parcelable {
-    String movieId;
-    String originalTitle;
-    String moviePosterImage;
-    String plotSynopsis;
-    String userRating;
-    String releaseDate;
+    public String movieId;
+    public String originalTitle;
+    public String moviePosterImage;
+    public String plotSynopsis;
+    public String userRating;
+    public String releaseDate;
 
     public MovieInfo (String movieId, String originalTitle, String moviePosterImage,
                       String plotSynopsis, String userRating, String releaseDate) {

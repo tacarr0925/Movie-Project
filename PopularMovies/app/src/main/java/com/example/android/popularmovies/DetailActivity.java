@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -14,18 +13,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieInfo;
+import com.example.android.popularmovies.data.MovieReview;
+import com.example.android.popularmovies.data.MovieTrailer;
+import com.example.android.popularmovies.sync.ReviewAsyncTaskLoader;
 import com.example.android.popularmovies.sync.TrailerAsyncTaskLoader;
-import com.example.android.popularmovies.utilities.FetchJsonTask;
-import com.example.android.popularmovies.utilities.MovieJsonUtils;
-import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler,
-        LoaderManager.LoaderCallbacks<ArrayList<MovieTrailer>> {
+        LoaderManager.LoaderCallbacks<ArrayList> {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -40,9 +38,13 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     private String mMovieId;
 
-    private RecyclerView mRecyclerView;
+    private RecyclerView mTrailerRecyclerView;
     private TrailerAdapter mTrailerAdapter;
     private ArrayList<MovieTrailer> mTrailerList;
+
+    private RecyclerView mReviewRecyclerView;
+    private ReviewAdapter mReviewAdapter;
+    private ArrayList<MovieReview> mReviewList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,13 +61,20 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         mUserRatingTextView = (TextView) findViewById(R.id.tv_detail_rating);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
+        mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
+        mReviewRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
 
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
+        mTrailerRecyclerView.setLayoutManager(layoutManager);
+        mTrailerRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager ReviewLayoutManager =
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        mReviewRecyclerView.setLayoutManager(ReviewLayoutManager);
+        mReviewRecyclerView.setHasFixedSize(true);
 
         Intent intentThatStartedThisActivity = getIntent();
 
@@ -88,7 +97,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         getSupportLoaderManager().initLoader(ID_TRAILER_LOADER, null, this);
         mTrailerAdapter = new TrailerAdapter(mTrailerList, this);
-        mRecyclerView.setAdapter(mTrailerAdapter);
+        mTrailerRecyclerView.setAdapter(mTrailerAdapter);
+
+        getSupportLoaderManager().initLoader(ID_REVIEW_LOADER, null, this);
+        mReviewAdapter = new ReviewAdapter(mReviewList);
+        mReviewRecyclerView.setAdapter(mReviewAdapter);
     }
 
     @Override
@@ -99,31 +112,56 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     @Override
-    public Loader<ArrayList<MovieTrailer>> onCreateLoader(int id, Bundle args) {
+    public Loader<ArrayList> onCreateLoader(int id, Bundle args) {
 
         switch (id) {
             case ID_TRAILER_LOADER:
                 return new TrailerAsyncTaskLoader(this, mMovieId);
+            case ID_REVIEW_LOADER:
+                return new ReviewAsyncTaskLoader(this, mMovieId);
             default:
-                throw new RuntimeException("Loader not Implemented" + id);
+                throw new RuntimeException("Loader not Implemented " + id);
         }
     }
 
+
     @Override
-    public void onLoadFinished(Loader<ArrayList<MovieTrailer>> loader, ArrayList<MovieTrailer> data) {
+    public void onLoadFinished(Loader<ArrayList> loader, ArrayList data) {
         //TODO Implement functionality commented out below
         //mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (data != null || !data.isEmpty()) {
+        if (data != null) {
             //showTrailerDataView();
-            mTrailerList = data;
-            mTrailerAdapter.setTrailerData(mTrailerList);
+            int id = loader.getId();
+            switch (id) {
+                case ID_TRAILER_LOADER:
+                    mTrailerList = data;
+                    mTrailerAdapter.setTrailerData(mTrailerList);
+                    break;
+                case ID_REVIEW_LOADER:
+                    mReviewList = data;
+                    mReviewAdapter.setReviewData(mReviewList);;
+                    break;
+                default:
+                    throw new RuntimeException("Loader not Implemented " + id);
+            }
+
         } /*else {
             showErrorMessage();
         }*/
     }
 
     @Override
-    public void onLoaderReset(Loader<ArrayList<MovieTrailer>> loader) {
-        mTrailerAdapter.setTrailerData(null);
+    public void onLoaderReset(Loader<ArrayList> loader) {
+        int id = loader.getId();
+        switch (id) {
+            case ID_TRAILER_LOADER:
+                mTrailerAdapter.setTrailerData(null);
+                break;
+            case ID_REVIEW_LOADER:
+                mReviewAdapter.setReviewData(null);
+                break;
+            default:
+                throw new RuntimeException("Loader not Implemented " + id);
+        }
     }
 }

@@ -34,6 +34,7 @@ public class NetworkUtils {
     final static String sortByPopMovies = "popular";
     final static String sortByTopRated = "top_rated";
     final static String VIDEOS = "videos";
+    final static String REVIEWS = "reviews";
 
     public static URL getMovieUrl(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -113,6 +114,24 @@ public class NetworkUtils {
         Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                 .appendPath(movieId)
                 .appendPath(VIDEOS)
+                .appendQueryParameter(PARM_API_KEY, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //TODO take the tag out.
+        Log.d(TAG, url.toString());
+        return url;
+    }
+
+    public static URL buildReviewUrl(String movieId) {
+        Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
+                .appendPath(movieId)
+                .appendPath(REVIEWS)
                 .appendQueryParameter(PARM_API_KEY, apiKey)
                 .build();
 

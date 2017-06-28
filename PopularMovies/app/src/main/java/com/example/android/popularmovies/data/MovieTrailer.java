@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.data;
 
 /**
  * Created by Travis on 6/18/2017.

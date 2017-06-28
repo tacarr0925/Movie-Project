@@ -3,7 +3,7 @@ package com.example.android.popularmovies.sync;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.example.android.popularmovies.MovieInfo;
+import com.example.android.popularmovies.data.MovieInfo;
 import com.example.android.popularmovies.utilities.MovieJsonUtils;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 
@@ -43,7 +43,7 @@ public class MovieAsyncTaskLoader extends AsyncTaskLoader<ArrayList<MovieInfo>> 
                     .getResponseFromHttpUrl(movieRequestUrl);
 
             mMovieInfoList = MovieJsonUtils
-                    .getMovieDBStringsFromJson(context, jsonMovieDBResponse);
+                    .getMovieDBStringsFromJson(jsonMovieDBResponse);
 
             return mMovieInfoList;
         } catch (Exception e) {

@@ -29,7 +29,7 @@
         android:id="@+id/tv_trailer_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="@string/trailer"
+        tools:text="@string/test_trailer"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="@+id/guideline"
         app:layout_constraintLeft_toRightOf="@+id/iv_button_play"

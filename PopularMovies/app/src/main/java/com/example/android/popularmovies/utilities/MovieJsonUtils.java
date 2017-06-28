@@ -2,8 +2,9 @@ package com.example.android.popularmovies.utilities;
 
 import android.content.Context;
 
-import com.example.android.popularmovies.MovieInfo;
-import com.example.android.popularmovies.MovieTrailer;
+import com.example.android.popularmovies.data.MovieInfo;
+import com.example.android.popularmovies.data.MovieReview;
+import com.example.android.popularmovies.data.MovieTrailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,12 +23,11 @@ public final class MovieJsonUtils {
     /**
      * This method Parses JSON from a web response and returns a ArrayList of MovieInfo
      *
-     * @param context context from MainActivity
      * @param movieJsonStr JSON response from the server
      * @return ArrayList of MovieInfo giving detail of each movie.
      * @throws JSONException if JSON data cannot be  properly parsed
      */
-    public static ArrayList<MovieInfo> getMovieDBStringsFromJson(Context context, String movieJsonStr)
+    public static ArrayList<MovieInfo> getMovieDBStringsFromJson(String movieJsonStr)
         throws JSONException {
 
         ArrayList<MovieInfo> movieInfoList = new ArrayList<>();
@@ -83,8 +83,8 @@ public final class MovieJsonUtils {
         return movieInfoList;
     }
 
-    public  static ArrayList<MovieTrailer> getTrailerStringFromJson(Context context, String trailerJsonStr)
-        throws JSONException {
+    public  static ArrayList<MovieTrailer> getTrailerStringFromJson(String trailerJsonStr)
+            throws JSONException {
 
         /*Trailer list*/
         final String RESULT = "results";
@@ -111,5 +111,35 @@ public final class MovieJsonUtils {
             trailerList.add(new MovieTrailer(name, youTubeKey));
         }
         return trailerList;
+    }
+
+    public  static ArrayList<MovieReview> getReviewStringFromJson(String trailerJsonStr)
+            throws JSONException {
+
+        /*Review list*/
+        final String RESULT = "results";
+        /*Author*/
+        final String AUTHOR = "author";
+        /*Review*/
+        final String CONTENT = "content";
+
+        ArrayList<MovieReview> reviewList = new ArrayList<>();
+
+        JSONObject reviewJson = new JSONObject(trailerJsonStr);
+
+        JSONArray reviewArray = reviewJson.getJSONArray(RESULT);
+
+        for (int i = 0; i < reviewArray.length(); i++) {
+            String author;
+            String content;
+
+            JSONObject reviewData = reviewArray.getJSONObject(i);
+
+            author = reviewData.getString(AUTHOR);
+            content = reviewData.getString(CONTENT);
+
+            reviewList.add(new MovieReview(author, content));
+        }
+        return reviewList;
     }
 }

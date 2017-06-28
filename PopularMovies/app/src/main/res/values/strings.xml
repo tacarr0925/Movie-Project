@@ -16,5 +16,7 @@
     <string name="pref_favorite_value" translatable="false">favorite</string>
 
     <!--Test Strings-->
-    <string name="trailer">Trailer</string>
+    <string name="test_trailer">Trailer</string>
+    <string name="test_author">Author</string>
+    <string name="test_review">People seem to think that if you enjoy a Christopher Nolan movie, you are a fanboy and the film couldn\'t really be that good.</string>
 </resources>

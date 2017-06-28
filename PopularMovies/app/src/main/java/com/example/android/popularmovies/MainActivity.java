@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieInfo;
 import com.example.android.popularmovies.sync.MovieAsyncTaskLoader;
 
 import java.util.ArrayList;
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     public void onLoadFinished(Loader<ArrayList<MovieInfo>> loader, ArrayList<MovieInfo> data) {
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (data != null  ||  !data.isEmpty()) {
+        if (data != null) {
             showMovieDataView();
             mMovieInfoList = data;
             mMovieInfoAdapter.setMovieData(mMovieInfoList);
