@@ -1,18 +1,24 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.data.MovieInfo;
 import com.example.android.popularmovies.data.MovieReview;
 import com.example.android.popularmovies.data.MovieTrailer;
@@ -23,12 +29,13 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler,
-        LoaderManager.LoaderCallbacks<ArrayList> {
+        LoaderManager.LoaderCallbacks {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
     private static final int ID_TRAILER_LOADER = 101;
     private static final int ID_REVIEW_LOADER = 102;
+    private static final int ID_CHECKBOX_LOADER = 103;
 
     private TextView mTitleTextView;
     private ImageView mImagePosterImageView;
@@ -36,7 +43,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private TextView mReleaseDateTextView;
     private TextView mUserRatingTextView;
 
-    private String mMovieId;
+    private CheckBox mFavoriteCheckBox;
 
     private RecyclerView mTrailerRecyclerView;
     private TrailerAdapter mTrailerAdapter;
@@ -45,6 +52,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private RecyclerView mReviewRecyclerView;
     private ReviewAdapter mReviewAdapter;
     private ArrayList<MovieReview> mReviewList;
+
+    private MovieInfo mMovieInfo;
+    private Uri mUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +70,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         mReleaseDateTextView = (TextView) findViewById(R.id.tv_detail_date);
 
         mUserRatingTextView = (TextView) findViewById(R.id.tv_detail_rating);
+
+        mFavoriteCheckBox = (CheckBox) findViewById(R.id.cb_favorites);
 
         mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
         mReviewRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
@@ -83,17 +95,21 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             MovieInfo movieInfo = bundle.getParcelable("parseMovieInfo");
 
             if (movieInfo != null) {
+                mMovieInfo = movieInfo;
                 mTitleTextView.setText(movieInfo.originalTitle);
                 mPlotTextView.setText(movieInfo.plotSynopsis);
                 mReleaseDateTextView.setText(movieInfo.releaseDate);
                 mUserRatingTextView.setText(movieInfo.userRating + "/10");
-                mMovieId = movieInfo.movieId;
 
                 Picasso.with(this)
                         .load(movieInfo.moviePosterImage)
                         .into(mImagePosterImageView);
             }
         }
+
+        //TODO only do below if preference is not favorites
+        mUri = MovieContract.MovieEntry.builderMovieUriWithMovieId(mMovieInfo.movieId);
+        getSupportLoaderManager().initLoader(ID_CHECKBOX_LOADER, null, this);
 
         getSupportLoaderManager().initLoader(ID_TRAILER_LOADER, null, this);
         mTrailerAdapter = new TrailerAdapter(mTrailerList, this);
@@ -111,22 +127,59 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         startActivity(new Intent(Intent.ACTION_VIEW, uri));
     }
 
+    public void onCheckboxClicked(View view) {
+        Uri uri;
+        ContentValues contentValues = new ContentValues();
+        boolean checked = ((CheckBox) view).isChecked();
+
+        switch (view.getId()) {
+            case R.id.cb_favorites:
+                if (checked) {
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+                            mMovieInfo.movieId);
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_RATING,
+                            mMovieInfo.userRating);
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
+                            mMovieInfo.releaseDate);
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS,
+                            mMovieInfo.plotSynopsis);
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE,
+                            mMovieInfo.originalTitle);
+
+                    uri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+                }
+                else {
+                    uri = MovieContract.MovieEntry.CONTENT_URI;
+                    uri = uri.buildUpon().appendPath(mMovieInfo.movieId).build();
+
+                    getContentResolver().delete(uri, null, null);
+                }
+                break;
+        }
+    }
+
     @Override
-    public Loader<ArrayList> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
 
         switch (id) {
             case ID_TRAILER_LOADER:
-                return new TrailerAsyncTaskLoader(this, mMovieId);
+                return new TrailerAsyncTaskLoader(this, mMovieInfo.movieId);
             case ID_REVIEW_LOADER:
-                return new ReviewAsyncTaskLoader(this, mMovieId);
+                return new ReviewAsyncTaskLoader(this, mMovieInfo.movieId);
+            case ID_CHECKBOX_LOADER:
+                return new CursorLoader(this,
+                        mUri,
+                        null,
+                        null,
+                        null,
+                        null);
             default:
                 throw new RuntimeException("Loader not Implemented " + id);
         }
     }
 
-
     @Override
-    public void onLoadFinished(Loader<ArrayList> loader, ArrayList data) {
+    public void onLoadFinished(Loader loader, Object data) {
         //TODO Implement functionality commented out below
         //mLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
@@ -134,12 +187,18 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             int id = loader.getId();
             switch (id) {
                 case ID_TRAILER_LOADER:
-                    mTrailerList = data;
+                    mTrailerList = (ArrayList<MovieTrailer>) data;
                     mTrailerAdapter.setTrailerData(mTrailerList);
                     break;
                 case ID_REVIEW_LOADER:
-                    mReviewList = data;
+                    mReviewList = (ArrayList<MovieReview>) data;
                     mReviewAdapter.setReviewData(mReviewList);;
+                    break;
+                case ID_CHECKBOX_LOADER:
+                    Cursor cursor = (Cursor) data;
+                    if (cursor != null && cursor.moveToFirst()) {
+                        mFavoriteCheckBox.setChecked(true);
+                    }
                     break;
                 default:
                     throw new RuntimeException("Loader not Implemented " + id);
@@ -151,7 +210,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     @Override
-    public void onLoaderReset(Loader<ArrayList> loader) {
+    public void onLoaderReset(Loader loader) {
         int id = loader.getId();
         switch (id) {
             case ID_TRAILER_LOADER:
@@ -159,6 +218,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 break;
             case ID_REVIEW_LOADER:
                 mReviewAdapter.setReviewData(null);
+                break;
+            case ID_CHECKBOX_LOADER:
                 break;
             default:
                 throw new RuntimeException("Loader not Implemented " + id);

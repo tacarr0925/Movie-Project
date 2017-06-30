@@ -88,7 +88,8 @@
             android:layout_height="wrap_content"
             android:button="@android:drawable/btn_star"
             app:layout_constraintLeft_toLeftOf="@+id/tv_detail_rating"
-            app:layout_constraintTop_toBottomOf="@+id/tv_detail_rating" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_detail_rating"
+            android:onClick="onCheckboxClicked" />
 
     </android.support.constraint.ConstraintLayout>
 
