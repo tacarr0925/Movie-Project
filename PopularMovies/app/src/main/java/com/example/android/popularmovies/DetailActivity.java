@@ -24,6 +24,7 @@ import com.example.android.popularmovies.data.MovieReview;
 import com.example.android.popularmovies.data.MovieTrailer;
 import com.example.android.popularmovies.sync.ReviewAsyncTaskLoader;
 import com.example.android.popularmovies.sync.TrailerAsyncTaskLoader;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -103,11 +104,13 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
                 Picasso.with(this)
                         .load(movieInfo.moviePosterImage)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .networkPolicy(NetworkPolicy.OFFLINE)
                         .into(mImagePosterImageView);
             }
         }
 
-        //TODO only do below if preference is not favorites
         mUri = MovieContract.MovieEntry.builderMovieUriWithMovieId(mMovieInfo.movieId);
         getSupportLoaderManager().initLoader(ID_CHECKBOX_LOADER, null, this);
 
@@ -145,6 +148,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                             mMovieInfo.plotSynopsis);
                     contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE,
                             mMovieInfo.originalTitle);
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER,
+                            mMovieInfo.moviePosterImage);
 
                     uri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
                 }

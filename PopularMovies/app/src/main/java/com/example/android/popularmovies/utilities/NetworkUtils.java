@@ -40,18 +40,19 @@ public class NetworkUtils {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String keyForMovieSort = context.getString(R.string.pref_sort_key);
         String defaultMovieSort = context.getString(R.string.pref_pop_movies_value);
+        URL url;
 
         String sortBy = sharedPreferences.getString(keyForMovieSort, defaultMovieSort);
 
         if (sortBy.equals(context.getString(R.string.pref_pop_movies_value))) {
-            return buildUrlWithPopularMovies();
+            url = buildUrlWithPopularMovies();
         } else if (sortBy.equals(context.getString(R.string.pref_top_rated_value))) {
-            return buildUrlWithTopRatedMovies();
+            url =  buildUrlWithTopRatedMovies();
+        } else {
+            url = buildUrlWithPopularMovies();
         }
 
-        Log.d(TAG, "No PREFERENCE");
-        //TODO fix after favorites added.
-        return buildUrlWithPopularMovies();
+        return url;
     }
 
     public static URL buildUrlWithPopularMovies() {
