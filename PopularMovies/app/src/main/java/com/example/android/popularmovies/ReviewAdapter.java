@@ -30,7 +30,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(R.layout.review_list_itme, parent, false);
+        View view = inflater.inflate(R.layout.review_list_item, parent, false);
         return new ReviewAdapterViewHolder(view);
     }
 

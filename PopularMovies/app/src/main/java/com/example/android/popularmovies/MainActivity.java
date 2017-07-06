@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.movie, menu);
 
-
         return true;
     }
 

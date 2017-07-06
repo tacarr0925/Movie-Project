@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,6 +77,7 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
     @Override
     public void onBindViewHolder(MovieInfoAdapterViewHolder movieInfoAdapterViewHolder, int position) {
         String moviePosterString = mMovieInfoList.get(position).moviePosterImage;
+        Log.d(TAG, mMovieInfoList.get(position).originalTitle + ":" + mMovieInfoList.get(position).moviePosterImage);
         Picasso.with(movieInfoAdapterViewHolder.mMoviePosterImageView.getContext())
                 .load(moviePosterString)
                 .placeholder(R.mipmap.ic_launcher)

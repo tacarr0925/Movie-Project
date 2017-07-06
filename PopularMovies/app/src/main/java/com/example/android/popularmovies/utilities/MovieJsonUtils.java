@@ -1,6 +1,7 @@
 package com.example.android.popularmovies.utilities;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieInfo;
 import com.example.android.popularmovies.data.MovieReview;
@@ -76,6 +77,8 @@ public final class MovieJsonUtils {
             plotSynopsis = movieData.getString(PLOT_SYNOPSIS);
             userRating = movieData.getString(USER_RATING);
             releaseDate = movieData.getString(RELEASE_DATE);
+
+            Log.d(TAG, title + ":" + posterPathUrl + posterPath);
 
             movieInfoList.add(new MovieInfo(id,title, posterPathUrl + posterPath, plotSynopsis, userRating, releaseDate));
         }
