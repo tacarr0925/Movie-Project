@@ -3,6 +3,7 @@
     <string name="error_message">An error has occurred. Please try again by selecting from the Spinner</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_share">Share</string>
 
     <string name="trailers_title">Trailers:</string>
     <string name="review_title">Reviews:</string>
