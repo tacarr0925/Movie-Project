@@ -82,7 +82,6 @@ public class MovieInfoAdapter extends RecyclerView.Adapter<MovieInfoAdapter.Movi
                 .load(moviePosterString)
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher)
-                .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(movieInfoAdapterViewHolder.mMoviePosterImageView);
     }
 
