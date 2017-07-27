@@ -132,6 +132,13 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.detail, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+
+        if (mTrailerList == null || mTrailerList.isEmpty()) {
+            menuItem.setVisible(false);
+        }
+
         return true;
     }
 
@@ -149,6 +156,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private Intent createShareIntent() {
+        //TODO Need to do something if trailer list is empty app crashes
         Intent shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
                 .setText(YOUTUBE_URL + mTrailerList.get(0).youTubeKey)
@@ -228,6 +236,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 case ID_TRAILER_LOADER:
                     mTrailerList = (ArrayList<MovieTrailer>) data;
                     mTrailerAdapter.setTrailerData(mTrailerList);
+                    invalidateOptionsMenu();
                     break;
                 case ID_REVIEW_LOADER:
                     mReviewList = (ArrayList<MovieReview>) data;
