@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
                 MovieInfo movieInfo;
                 mMovieInfoList.clear();
                 cursor.moveToPosition(-1);
-                try {
+
                     while (cursor.moveToNext()) {
                         movieInfo = new MovieInfo(cursor.getString(INDEX_MOVIE_ID),
                                 cursor.getString(INDEX_TITLE),
@@ -240,13 +240,10 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
                                 cursor.getString(INDEX_SYNOPSIS),
                                 cursor.getString(INDEX_RATING),
                                 cursor.getString(INDEX_RELEASE_DATE)
-                                );
+                        );
 
                         mMovieInfoList.add(movieInfo);
                     }
-                } finally {
-                    cursor.close();
-                }
 
             } else {
                 showMovieDataView();
