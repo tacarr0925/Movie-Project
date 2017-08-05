@@ -21,7 +21,7 @@
     <string name="pref_sort_default_value" translatable="false">popular</string>
 
     <!--Test Strings-->
-    <string name="test_trailer">Trailer</string>
+    <string name="test_trailer">Peter Fonda On Hope And the Shawshank Review test test test test</string>
     <string name="test_author">Author</string>
     <string name="test_review">People seem to think that if you enjoy a Christopher Nolan movie, you are a fanboy and the film couldn\'t really be that good.</string>
 

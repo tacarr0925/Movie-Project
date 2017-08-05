@@ -31,7 +31,10 @@ import com.example.android.popularmovies.sync.TrailerAsyncTaskLoader;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler,
         LoaderManager.LoaderCallbacks {
@@ -99,12 +102,21 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         if (intentThatStartedThisActivity != null) {
             Bundle bundle = intentThatStartedThisActivity.getExtras();
             MovieInfo movieInfo = bundle.getParcelable("parseMovieInfo");
+            SimpleDateFormat unformatted = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat formatted = new SimpleDateFormat("yyyy");
 
             if (movieInfo != null) {
                 mMovieInfo = movieInfo;
                 mTitleTextView.setText(movieInfo.originalTitle);
                 mPlotTextView.setText(movieInfo.plotSynopsis);
-                mReleaseDateTextView.setText(movieInfo.releaseDate);
+
+                try {
+                    Date date = unformatted.parse(movieInfo.releaseDate);
+                    mReleaseDateTextView.setText(formatted.format(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
                 mUserRatingTextView.setText(movieInfo.userRating + "/10");
 
                 Picasso.with(this)
