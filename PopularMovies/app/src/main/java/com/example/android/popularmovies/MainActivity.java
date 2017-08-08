@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         LoaderManager.LoaderCallbacks,
         SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String KEY_RECYCLER_STATE = "recycler_state";
 
     private static final int ID_MOVIE_LOADER = 100;
     private static final int ID_FAVORITES_LOADER = 101;
@@ -38,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
     private RecyclerView mRecyclerView;
     private MovieInfoAdapter mMovieInfoAdapter;
     private ArrayList<MovieInfo> mMovieInfoList;
+
+    private GridLayoutManager mLayoutManager;
+
+    private Parcelable mListState;
 
     private TextView mErrorMessageDisplay;
 
@@ -78,21 +84,14 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         final int spanCount = getResources().getInteger(R.integer.grid_columns);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, spanCount);
+        mLayoutManager = new GridLayoutManager(this, spanCount);
         setupSharedPreferences();
 
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        if (savedInstanceState == null || !savedInstanceState.containsKey("movieInfoList")) {
-            mMovieInfoList = new ArrayList<>();
-        }
-        else {
-            mMovieInfoList = savedInstanceState.getParcelableArrayList("movieInfoList");
-
-            if (mMovieInfoList == null || mMovieInfoList.size() == 0) {
-                loadMovieData();
-            }
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_RECYCLER_STATE)) {
+            mListState = savedInstanceState.getParcelable(KEY_RECYCLER_STATE);
         }
 
         if (MoviePreferences.isSortByFavorites(this)) {
@@ -100,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
         } else {
             getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
         }
+
         mMovieInfoAdapter = new MovieInfoAdapter(mMovieInfoList, this);
         mRecyclerView.setAdapter(mMovieInfoAdapter);
     }
@@ -118,8 +118,19 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movieInfoList", mMovieInfoList);
+        mListState = mLayoutManager.onSaveInstanceState();
+
+        outState.putParcelable(KEY_RECYCLER_STATE, mListState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mListState != null) {
+            mLayoutManager.onRestoreInstanceState(mListState);
+        }
     }
 
     @Override
@@ -251,7 +262,9 @@ public class MainActivity extends AppCompatActivity implements MovieInfoAdapter.
             }
 
             mMovieInfoAdapter.setMovieData(mMovieInfoList);
-            mRecyclerView.smoothScrollToPosition(0);
+            if (mListState == null) {
+                mRecyclerView.smoothScrollToPosition(0);
+            }
         } else {
             showErrorMessage();
         }

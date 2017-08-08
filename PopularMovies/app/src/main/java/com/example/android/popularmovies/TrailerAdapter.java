@@ -59,7 +59,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
             super(itemView);
             mTrailerNameTextView = (TextView) itemView.findViewById(R.id.tv_trailer_name);
             itemView.setOnClickListener(this);
-            //TODO update onClick to the Image button and not the View
         }
 
         @Override

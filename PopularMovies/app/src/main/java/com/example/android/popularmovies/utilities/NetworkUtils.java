@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.R;
 
 import java.io.IOException;
@@ -23,13 +24,14 @@ import java.util.Scanner;
 public class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
+    private static final int FIVE_SECONDS = 5000;
+    private static final int TEN_SECONDS = 10000;
 
     final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie";
 
 
     final static String PARM_API_KEY = "api_key";
-    final static String apiKey = "{ADD YOUR API KEY}";
-    //final static String apiKey = "";
+    final static String apiKey = BuildConfig.THE_MOVIE_DB_API_TOKEN;
 
     final static String sortByPopMovies = "popular";
     final static String sortByTopRated = "top_rated";
@@ -156,6 +158,9 @@ public class NetworkUtils {
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
+            urlConnection.setConnectTimeout(FIVE_SECONDS);
+            urlConnection.setReadTimeout(TEN_SECONDS);
+
             InputStream in = urlConnection.getInputStream();
 
             Scanner scanner = new Scanner(in);

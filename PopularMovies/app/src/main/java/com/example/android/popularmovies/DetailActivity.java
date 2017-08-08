@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
@@ -40,6 +42,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         LoaderManager.LoaderCallbacks {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
+    private static final String KEY_TRAILER_STATE = "trailer_state";
+    private static final String KEY_REVIEW_STATE = "review_state";
 
     private static final int ID_TRAILER_LOADER = 101;
     private static final int ID_REVIEW_LOADER = 102;
@@ -51,6 +55,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private TextView mPlotTextView;
     private TextView mReleaseDateTextView;
     private TextView mUserRatingTextView;
+
+    private LinearLayoutManager mTrailerLayoutManager;
+    private LinearLayoutManager mReviewLayoutManager;
+
+    private Parcelable mTrailerListState;
+    private Parcelable mReviewListState;
 
     private CheckBox mFavoriteCheckBox;
 
@@ -85,46 +95,57 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         mTrailerRecyclerView = (RecyclerView) findViewById(R.id.rv_trailers);
         mReviewRecyclerView = (RecyclerView) findViewById(R.id.rv_reviews);
 
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mTrailerLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        mTrailerRecyclerView.setLayoutManager(layoutManager);
+        mTrailerRecyclerView.setLayoutManager(mTrailerLayoutManager);
         mTrailerRecyclerView.setHasFixedSize(true);
 
-        LinearLayoutManager ReviewLayoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mReviewLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        mReviewRecyclerView.setLayoutManager(ReviewLayoutManager);
+        mReviewRecyclerView.setLayoutManager(mReviewLayoutManager);
         mReviewRecyclerView.setHasFixedSize(true);
 
         Intent intentThatStartedThisActivity = getIntent();
 
         if (intentThatStartedThisActivity != null) {
             Bundle bundle = intentThatStartedThisActivity.getExtras();
-            MovieInfo movieInfo = bundle.getParcelable("parseMovieInfo");
-            SimpleDateFormat unformatted = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat formatted = new SimpleDateFormat("yyyy");
 
-            if (movieInfo != null) {
-                mMovieInfo = movieInfo;
-                mTitleTextView.setText(movieInfo.originalTitle);
-                mPlotTextView.setText(movieInfo.plotSynopsis);
+            if (bundle != null) {
+                MovieInfo movieInfo = bundle.getParcelable("parseMovieInfo");
+                SimpleDateFormat unformatted = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat formatted = new SimpleDateFormat("yyyy");
 
-                try {
-                    Date date = unformatted.parse(movieInfo.releaseDate);
-                    mReleaseDateTextView.setText(formatted.format(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                if (movieInfo != null) {
+                    mMovieInfo = movieInfo;
+                    mTitleTextView.setText(movieInfo.originalTitle);
+                    mPlotTextView.setText(movieInfo.plotSynopsis);
+
+                    try {
+                        Date date = unformatted.parse(movieInfo.releaseDate);
+                        mReleaseDateTextView.setText(formatted.format(date));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    mUserRatingTextView.setText(movieInfo.userRating + "/10");
+
+                    Picasso.with(this)
+                            .load(movieInfo.moviePosterImage)
+                            .placeholder(R.mipmap.ic_launcher)
+                            .error(R.mipmap.ic_launcher)
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .into(mImagePosterImageView);
                 }
+            }
+        }
 
-                mUserRatingTextView.setText(movieInfo.userRating + "/10");
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(KEY_TRAILER_STATE)) {
+                mTrailerListState = savedInstanceState.getParcelable(KEY_TRAILER_STATE);
+            }
 
-                Picasso.with(this)
-                        .load(movieInfo.moviePosterImage)
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.mipmap.ic_launcher)
-                        .networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(mImagePosterImageView);
+            if (savedInstanceState.containsKey(KEY_REVIEW_STATE)) {
+                mTrailerListState = savedInstanceState.getParcelable(KEY_REVIEW_STATE);
             }
         }
 
@@ -138,6 +159,30 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         getSupportLoaderManager().initLoader(ID_REVIEW_LOADER, null, this);
         mReviewAdapter = new ReviewAdapter(mReviewList);
         mReviewRecyclerView.setAdapter(mReviewAdapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        mTrailerListState = mTrailerLayoutManager.onSaveInstanceState();
+        mReviewListState = mReviewLayoutManager.onSaveInstanceState();
+
+        outState.putParcelable(KEY_TRAILER_STATE, mTrailerListState);
+        outState.putParcelable(KEY_REVIEW_STATE, mReviewListState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mTrailerListState != null) {
+            mTrailerLayoutManager.onRestoreInstanceState(mTrailerListState);
+        }
+
+        if (mReviewListState != null) {
+
+            mReviewLayoutManager.onRestoreInstanceState(mReviewListState);
+        }
     }
 
     @Override
@@ -168,7 +213,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private Intent createShareIntent() {
-        //TODO Need to do something if trailer list is empty app crashes
         Intent shareIntent = ShareCompat.IntentBuilder.from(this)
                 .setType("text/plain")
                 .setText(YOUTUBE_URL + mTrailerList.get(0).youTubeKey)
@@ -181,7 +225,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     public void onClick(String key) {
         Uri uri = Uri.parse(YOUTUBE_URL + key);
         Log.d(TAG, uri.toString());
-        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     public void onCheckboxClicked(View view) {
@@ -239,10 +286,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     @Override
     public void onLoadFinished(Loader loader, Object data) {
-        //TODO Implement functionality commented out below
-        //mLoadingIndicator.setVisibility(View.INVISIBLE);
         if (data != null) {
-            //showTrailerDataView();
             int id = loader.getId();
             switch (id) {
                 case ID_TRAILER_LOADER:
@@ -252,7 +296,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     break;
                 case ID_REVIEW_LOADER:
                     mReviewList = (ArrayList<MovieReview>) data;
-                    mReviewAdapter.setReviewData(mReviewList);;
+                    mReviewAdapter.setReviewData(mReviewList);
+                    ;
                     break;
                 case ID_CHECKBOX_LOADER:
                     Cursor cursor = (Cursor) data;
@@ -264,9 +309,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                     throw new RuntimeException("Loader not Implemented " + id);
             }
 
-        } /*else {
-            showErrorMessage();
-        }*/
+        }
     }
 
     @Override
